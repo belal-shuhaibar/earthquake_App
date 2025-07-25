@@ -4,6 +4,8 @@ This Streamlit app fetches earthquake data from the USGS API, allows users to fi
 and visualizes the data on an interactive map. It also provides analytics and logs query history
 using SQLite.
 """
+
+"""Earthquake Data Analysis and Visualization App"""
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
@@ -13,6 +15,9 @@ from streamlit_folium import st_folium
 from usgs_api import fetch_earthquake_data
 from db_logger import init_db, log_query, get_query_history
 from database import fetch_and_store_sample_data
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import matplotlib.pyplot as plt
 
 # ------------------ Setup Logging ------------------
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -115,13 +120,34 @@ with tab1:
 with tab2:
     with st.expander("📈 Earthquake Timeline"):
         st.subheader("Number of Earthquakes per Day")
-        df["date"] = df["time"].dt.date
+        df["date"] = pd.to_datetime(df["time"]).dt.date
         timeline = df.groupby("date").size()
         st.line_chart(timeline)
 
     with st.expander("📊 Magnitude Distribution"):
         st.subheader("Magnitude Frequency Histogram")
         st.bar_chart(df["magnitude"].value_counts().sort_index())
+
+    with st.expander("📉 Linear Regression - Date vs Avg Magnitude"):
+        st.subheader("Trend of Average Earthquake Magnitude Over Time")
+        df["date"] = pd.to_datetime(df["time"]).dt.date
+        daily_avg_mag = df.groupby("date")["magnitude"].mean().reset_index()
+        daily_avg_mag["ordinal_date"] = pd.to_datetime(daily_avg_mag["date"]).map(datetime.toordinal)
+
+        X = daily_avg_mag["ordinal_date"].values.reshape(-1, 1)
+        y = daily_avg_mag["magnitude"].values
+        model = LinearRegression()
+        model.fit(X, y)
+        y_pred = model.predict(X)
+
+        fig, ax = plt.subplots(figsize=(10, 5))
+        ax.scatter(daily_avg_mag["date"], y, label="Actual", color="blue")
+        ax.plot(daily_avg_mag["date"], y_pred, label="Linear Fit", color="red")
+        ax.set_xlabel("Date")
+        ax.set_ylabel("Average Magnitude")
+        ax.set_title("Linear Regression - Date vs Avg Magnitude")
+        ax.legend()
+        st.pyplot(fig)
 
     with st.expander(" Top 10 Strongest Earthquakes"):
         st.subheader("Top Earthquakes by Magnitude")
@@ -144,4 +170,3 @@ with tab3:
 # ------------------ Footer ------------------
 st.markdown('<div class="footer">  USGS Data API · Folium</div>', unsafe_allow_html=True)
 logger.info("App execution completed.")
-
