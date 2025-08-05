@@ -69,9 +69,9 @@ This Streamlit web application allows users to explore real-time earthquake data
 
 ##  Team Members
 
-- **Member 1** – API integration (`usgs_api.py`)
-- **Member 2** – Database management (`database.py`, `db_logger.py`)
-- **Member 3** – Frontend & Streamlit integration (`app.py`)
+- Vijay Javvaji– API integration (`usgs_api.py`)
+- Belal Shuhaibar– Database management (`database.py`, `db_logger.py`)
+- Mithil Sai Yachamaneni– Frontend & Streamlit integration (`app.py`)
 
 ---
 
@@ -113,12 +113,3 @@ This Streamlit web application allows users to explore real-time earthquake data
 - [Streamlit Documentation](https://docs.streamlit.io/)
 - [SQLite Official Docs](https://www.sqlite.org/docs.html)
 
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-```
-
-Let me know if you'd like to include badges, environment variable setup, or deployment instructions (e.g., Streamlit Cloud or Heroku).
